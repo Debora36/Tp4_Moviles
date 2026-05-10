@@ -14,21 +14,22 @@ import com.debora.tp4productos.databinding.FragmentReflowBinding;
 
 public class ReflowFragment extends Fragment {
     private FragmentReflowBinding binding;
+    private ReflowViewModel vm;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        //Instancia compartida con toda la Activity
-        ReflowViewModel reflowViewModel =
-                new ViewModelProvider(requireActivity()).get(ReflowViewModel.class);
-
+        vm= new ViewModelProvider(this).get(ReflowViewModel.class);
 
         binding = FragmentReflowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         //observer del mensaje
-        reflowViewModel.getMensajeToast().observe(getViewLifecycleOwner(), mensaje -> {
+        vm.getMensajeToast().observe(getViewLifecycleOwner(), mensaje -> {
             if (mensaje != null) {
                 Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            }
+            if (mensaje =="Producto cargado exitosamente") {
+                limpiarCampos();
             }
         });
         //listener del boton
@@ -37,10 +38,7 @@ public class ReflowFragment extends Fragment {
             String desc = binding.etDescripcion.getText().toString();
             String precio = binding.etPrecio.getText().toString();
 
-            boolean exito = reflowViewModel.cargarProducto(cod, desc, precio);
-            if (exito) {
-                limpiarCampos();//limpia los campos solo si se cargo correctamente
-            }
+            vm.cargarProducto(cod, desc, precio);
         });
 
         return root;

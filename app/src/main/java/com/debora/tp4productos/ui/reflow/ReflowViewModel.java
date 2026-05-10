@@ -13,42 +13,40 @@ import com.debora.tp4productos.modelo.Producto;
 import java.util.HashSet;
 
 public class ReflowViewModel extends AndroidViewModel {
-    private final MutableLiveData<String> mensajeToast = new MutableLiveData<>();
-    private final MutableLiveData<HashSet<Producto>> listaProductos = new MutableLiveData<>(new HashSet<>());
+    private MutableLiveData<String> mensajeToast;
     public ReflowViewModel(@NonNull Application application) {
         super(application);
     }
     public LiveData<String> getMensajeToast() {
+        if(mensajeToast==null){
+            mensajeToast=new MutableLiveData<>();
+        }
         return mensajeToast;
     }
-    public LiveData<HashSet<Producto>> getListaProductos() {
-        return listaProductos;
-    }
 
 
-    public boolean cargarProducto(String cod, String desc, String precioStr) {
+    public void cargarProducto(String cod, String desc, String precioStr) {
         // Validación de campos vacíos
         if (cod.isEmpty() || desc.isEmpty() || precioStr.isEmpty()) {
             mensajeToast.setValue("Todos los campos son obligatorios");
-            return false;
+            return;
         }
 
         try {
             double precio = Double.parseDouble(precioStr);
             Producto nuevo = new Producto(cod, desc, precio);
 
-            HashSet<Producto> actual = listaProductos.getValue();
-            if (actual != null && actual.add(nuevo)) {
-                listaProductos.setValue(actual);
+            boolean agregado = MainActivity.listaProductos.add(nuevo);
+            if (agregado) {
                 mensajeToast.setValue("Producto cargado exitosamente");
-                return true;
+                return;
             } else {
                 mensajeToast.setValue("El codigo ya existe");
-                return false;
+                return;
             }
         } catch (NumberFormatException e) {
             mensajeToast.setValue("El precio es invalido");
-            return false;
+            return;
         }
     }
 }

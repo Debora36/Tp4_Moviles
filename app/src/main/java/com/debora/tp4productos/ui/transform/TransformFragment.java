@@ -26,28 +26,26 @@ public class TransformFragment extends Fragment {
 
     private FragmentTransformBinding binding;
     private ProductoAdapter adapter;
-    private ReflowViewModel sharedViewModel; // Referencia al viewModel
+    private TransformViewModel vm;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(ReflowViewModel.class);
+        vm = new ViewModelProvider(this).get(TransformViewModel.class);
         binding = FragmentTransformBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         adapter = new ProductoAdapter(new ArrayList<>(), getLayoutInflater());//Arranca con una lista vacia
 
-        sharedViewModel.getListaProductos().observe(getViewLifecycleOwner(), productos -> {
+        vm.getListaFiltrada().observe(getViewLifecycleOwner(), productos -> {
             if (productos != null) {
-                List<Producto> lista = new ArrayList<>(productos);
-                Collections.sort(lista, (p1, p2) ->
-                        p1.getDescripcion().compareToIgnoreCase(p2.getDescripcion()));
-                adapter.actualizarLista(lista);
+                adapter.actualizarLista(productos);
             }
         });
 
         binding.recyclerviewTransform.setAdapter(adapter);
         binding.recyclerviewTransform.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        vm.cargarYOrdenarProductos();
         return root;
     }
 
